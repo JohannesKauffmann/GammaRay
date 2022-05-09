@@ -57,6 +57,7 @@
 #include "common/paths.h"
 #include <common/probecontrollerinterface.h>
 #include <common/remoteviewframe.h>
+#include <common/endpoint.h>
 
 #include <3rdparty/kde/krecursivefilterproxymodel.h>
 
@@ -151,6 +152,11 @@ WidgetInspectorServer::WidgetInspectorServer(Probe *probe, QObject *parent)
 
     connect(probe, &Probe::objectSelected, this,
             &WidgetInspectorServer::objectSelected);
+
+    connect(Endpoint::instance(), &Endpoint::disconnected, this, [this]() {
+        if (m_overlayWidget)
+            m_overlayWidget->hide();
+    });
 
     connect(m_remoteView, &RemoteViewServer::elementsAtRequested, this, &WidgetInspectorServer::requestElementsAt);
     connect(this, &WidgetInspectorServer::elementsAtReceived, m_remoteView, &RemoteViewInterface::elementsAtReceived);
